@@ -1,8 +1,7 @@
 package com.uady.sistemavotaciones.dao;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VotacionDAO implements DAO<String> {
@@ -15,17 +14,29 @@ public class VotacionDAO implements DAO<String> {
 
     @Override
     public void registrar(String message) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true));) {
             writer.write(message);
-            System.out.println("Texto escrito en el archivo exitosamente.");
+            writer.newLine();
         } catch (IOException e) {
-            System.err.println("Error al registrar.");
+            System.err.println("Error al registrar.\n" + e.getMessage());
         }
     }
 
     @Override
     public List<String> obtenerTodos() {
-        return null;
+        List<String> lineas = new ArrayList<>();
+
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath))) {
+            String linea;
+            while ((linea = bufferedReader.readLine()) != null) {
+                lineas.add(linea);
+            }
+        } catch (IOException e) {
+            System.err.println("Error al registrar.\n" + e.getMessage());
+
+        }
+
+        return lineas;
     }
 
     @Override

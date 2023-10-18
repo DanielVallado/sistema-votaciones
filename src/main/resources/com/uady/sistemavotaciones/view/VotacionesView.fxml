@@ -20,6 +20,7 @@
         <RowConstraints maxHeight="360.0" minHeight="10.0" prefHeight="250.0" vgrow="SOMETIMES" />
         <RowConstraints maxHeight="125.0" minHeight="10.0" prefHeight="70.0" vgrow="SOMETIMES" />
       <RowConstraints maxHeight="68.0" minHeight="10.0" prefHeight="68.0" vgrow="SOMETIMES" />
+      <RowConstraints maxHeight="81.0" minHeight="10.0" prefHeight="81.0" vgrow="SOMETIMES" />
     </rowConstraints>
      <Label alignment="CENTER" contentDisplay="CENTER" text="SISTEMA DE VOTACIONES" textAlignment="CENTER" GridPane.columnSpan="2147483647" GridPane.halignment="CENTER">
          <font>
@@ -29,21 +30,21 @@
     <ImageView fx:id="imgProducto1" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
     <ImageView fx:id="imgProducto2" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
     <ImageView fx:id="imgProducto3" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-   <Button fx:id="botonVotar1" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="Votar Opción 1" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
+   <Button fx:id="botonVotar1" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="Votar Corn Flakes" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
       <padding>
          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
       </padding>
       <font>
          <Font name="Work Sans Medium" size="18.0" />
       </font></Button>
-   <Button fx:id="botonVotar2" contentDisplay="CENTER" mnemonicParsing="false" text="Votar Opción 2" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+   <Button fx:id="botonVotar2" contentDisplay="CENTER" mnemonicParsing="false" text="Votar Oreo's" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3">
       <padding>
          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
       </padding>
       <font>
          <Font name="Work Sans Medium" size="18.0" />
       </font></Button>
-   <Button fx:id="botonVotar3" contentDisplay="CENTER" mnemonicParsing="false" text="Votar Opción 3" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
+   <Button fx:id="botonVotar3" contentDisplay="CENTER" mnemonicParsing="false" text="Votar Nesquik" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3">
       <padding>
          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
       </padding>
@@ -65,4 +66,12 @@
          <Font name="Work Sans Medium" size="18.0" />
       </font>
    </Label>
+   <Button fx:id="botonEstadisticas" mnemonicParsing="false" onAction="#verEstadisticas" prefHeight="35.0" prefWidth="95.0" text="Estadísticas" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="4" GridPane.valignment="BOTTOM">
+      <GridPane.margin>
+         <Insets bottom="10.0" left="25.0" right="55.0" top="25.0" />
+      </GridPane.margin>
+      <font>
+         <Font name="Work Sans Medium" size="12.0" />
+      </font>
+   </Button>
 </GridPane>
