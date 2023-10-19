@@ -13,7 +13,7 @@ import java.util.ResourceBundle;
 public class GraficaDeBarrasController implements Initializable {
 
     @FXML
-    private BarChart barChart;
+    private BarChart<String, Integer> barChart;
     @FXML
     private Text graficaDeBarrasTexto;
 
@@ -25,15 +25,22 @@ public class GraficaDeBarrasController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        XYChart.Series<String, Integer> series = new XYChart.Series<>();
-
-        // Iterar a través del mapa y agregar los datos a la serie
-        for (Map.Entry<String, Integer> entry : datos.entrySet()) {
-            series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
-        }
-
-        barChart.getData().add(series);
+        colocarDatos(this.datos);
         graficaDeBarrasTexto.setText("Gráfica de Barras");
+    }
+
+    public void actualizarDatos(Map<String, Integer> nuevosDatos) {
+        barChart.getData().clear();
+        colocarDatos(nuevosDatos);
+    }
+
+    private void colocarDatos(Map<String, Integer> datos) {
+        for (Map.Entry<String, Integer> entry : datos.entrySet()) {
+            XYChart.Series<String, Integer> series = new XYChart.Series<>();
+            series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+            series.setName(entry.getKey());
+            barChart.getData().add(series);
+        }
     }
 
 }

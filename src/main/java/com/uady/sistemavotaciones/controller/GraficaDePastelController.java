@@ -22,15 +22,22 @@ public class GraficaDePastelController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        colocarDatos(datos);
+        graficaDePastel.setTitle("Votos en pasteles");
+    }
+
+    public void actualizarDatos(Map<String, Integer> nuevosDatos) {
+        colocarDatos(nuevosDatos);
+    }
+
+    private void colocarDatos(Map<String, Integer> nuevosDatos) {
         ObservableList<PieChart.Data> graficaDePastelData = FXCollections.observableArrayList();
 
-        // Iterar a través del mapa y agregar los datos a la gráfica
-        for (Map.Entry<String, Integer> entry : datos.entrySet()) {
+        for (Map.Entry<String, Integer> entry : nuevosDatos.entrySet()) {
             graficaDePastelData.add(new PieChart.Data(entry.getKey(), entry.getValue()));
         }
 
         graficaDePastel.setData(graficaDePastelData);
-        graficaDePastel.setTitle("Votos en pasteles");
     }
 
 }

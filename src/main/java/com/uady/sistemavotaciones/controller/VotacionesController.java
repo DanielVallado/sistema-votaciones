@@ -2,7 +2,6 @@ package com.uady.sistemavotaciones.controller;
 
 import com.uady.sistemavotaciones.dao.VotacionDAO;
 import com.uady.sistemavotaciones.util.Util;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -37,8 +36,6 @@ public class VotacionesController implements Initializable {
     @FXML
     private Button botonVotar3;
     @FXML
-    private Button botonEstadisticas;
-    @FXML
     private ImageView imgProducto1;
     @FXML
     private ImageView imgProducto2;
@@ -47,6 +44,9 @@ public class VotacionesController implements Initializable {
 
     private final Map<String, Integer> datos;
     private final Map<String, String> productos;
+    private GraficaDeBarrasController graficaDeBarrasController;
+    private GraficaDePastelController graficaDePastelController;
+
 
     public VotacionesController() {
         this.datos = new HashMap<>();
@@ -64,7 +64,7 @@ public class VotacionesController implements Initializable {
     }
 
     @FXML
-    public void verEstadisticas(ActionEvent actionEvent) {
+    public void verEstadisticas() {
         String GRAFICA_BARRAS_PATH = "/com/uady/sistemavotaciones/view/GraficaDeBarrasView.fxml";
         mostrarGraficaBarras(Util.obtenerPath(GRAFICA_BARRAS_PATH));
 
@@ -74,14 +74,16 @@ public class VotacionesController implements Initializable {
 
     private void mostrarGraficaBarras(URL filePath) {
         FXMLLoader fxmlLoader = new FXMLLoader(filePath);
-        fxmlLoader.setController(new GraficaDeBarrasController(datos));
+        this.graficaDeBarrasController = new GraficaDeBarrasController(datos);
+        fxmlLoader.setController(graficaDeBarrasController);
         Scene scene = getScene(fxmlLoader);
         modificarScene("Sistema de Votaciones | Gráfica de Barras", scene);
     }
 
     private void mostrarGraficaPasteles(URL filePath) {
         FXMLLoader fxmlLoader = new FXMLLoader(filePath);
-        fxmlLoader.setController(new GraficaDePastelController(datos));
+        this.graficaDePastelController = new GraficaDePastelController(datos);
+        fxmlLoader.setController(graficaDePastelController);
         Scene scene = getScene(fxmlLoader);
         modificarScene("Sistema de Votaciones | Gráfica de Pastel", scene);
     }
@@ -129,10 +131,32 @@ public class VotacionesController implements Initializable {
 
     private void colocarVotos() {
         for (Map.Entry<String, String> entry : productos.entrySet()) {
-            Integer cantVotos =  contarVotos(entry.getValue());
-            datos.put(entry.getKey(), cantVotos);
+            String producto = entry.getKey();
+            int cantVotos =  contarVotos(entry.getValue());
+            datos.put(producto, cantVotos);
+            actualizarEtiqueta(producto, cantVotos);
+            actualizarGraficas();
         }
     }
+
+    private void actualizarEtiqueta(String producto, int cantidadVotos) {
+        switch (producto) {
+            case "Corn Flakes" -> contOpcion1.setText(String.valueOf(cantidadVotos));
+            case "Oreo's" -> contOpcion2.setText(String.valueOf(cantidadVotos));
+            case "Nesquik" -> contOpcion3.setText(String.valueOf(cantidadVotos));
+        }
+    }
+
+    private void actualizarGraficas() {
+        if (graficaDeBarrasController != null) {
+            graficaDeBarrasController.actualizarDatos(datos);
+        }
+        if (graficaDePastelController != null) {
+            graficaDePastelController.actualizarDatos(datos);
+        }
+
+    }
+
 
     private int contarVotos(String filePath) {
         VotacionDAO votacionDAO = new VotacionDAO(filePath);
