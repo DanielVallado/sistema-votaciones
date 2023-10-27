@@ -1,46 +1,57 @@
 package com.uady.sistemavotaciones.controller;
 
+import com.uady.sistemavotaciones.enums.Color;
+import com.uady.sistemavotaciones.model.Dato;
+import com.uady.sistemavotaciones.model.Producto;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.text.Text;
+import lombok.extern.log4j.Log4j2;
 
 import java.net.URL;
-import java.util.Map;
+import java.util.List;
 import java.util.ResourceBundle;
 
-public class GraficaDeBarrasController implements Initializable {
+@Log4j2
+public class GraficaDeBarrasController implements Initializable, GraficaController {
 
     @FXML
     private BarChart<String, Integer> barChart;
     @FXML
     private Text graficaDeBarrasTexto;
 
-    private final Map<String, Integer> datos;
-
-    public GraficaDeBarrasController(Map<String, Integer> datos) {
-        this.datos = datos;
-    }
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        colocarDatos(this.datos);
-        graficaDeBarrasTexto.setText("Gráfica de Barras");
+        log.info("Creación gráfica de barras");
+        graficaDeBarrasTexto.setText("Votaciones");
     }
 
-    public void actualizarDatos(Map<String, Integer> nuevosDatos) {
+    public void actualizarDatos(List<Producto> datos) {
         barChart.getData().clear();
-        colocarDatos(nuevosDatos);
-    }
+        Color[] colores = Color.values();
 
-    private void colocarDatos(Map<String, Integer> datos) {
-        for (Map.Entry<String, Integer> entry : datos.entrySet()) {
+        int indiceColor = 0;
+        for (Dato dato : datos) {
             XYChart.Series<String, Integer> series = new XYChart.Series<>();
-            series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
-            series.setName(entry.getKey());
+            XYChart.Data<String, Integer> data = new XYChart.Data<>(dato.getNombreDato(), dato.getCantidadDato());
+
+            series.setName(dato.getNombreDato());
+            series.getData().add(data);
             barChart.getData().add(series);
+
+            Node bar = data.getNode();
+            if (bar != null) {
+                Color color = colores[indiceColor % colores.length];
+                bar.setStyle("-fx-bar-fill: " + color.hexCode);
+            }
+
+            indiceColor++;
         }
+
+        log.info("Actualización de datos realizada");
     }
 
 }

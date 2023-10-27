@@ -1,14 +1,17 @@
 package com.uady.sistemavotaciones.util;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.io.InputStream;
 import java.net.URL;
 
+@Log4j2
 public class Util {
 
     public static URL obtenerPath(String filePath) {
         URL path = Util.class.getResource(filePath);
         if (path == null) {
-            System.out.printf("Archivo %s no encontrado.", filePath);
+            log.error("Archivo " + filePath +" no encontrado");
             System.exit(1);
         }
         return path;
@@ -17,7 +20,7 @@ public class Util {
     public static InputStream obtenerImg(String filePath) {
         InputStream path = Util.class.getResourceAsStream(filePath);
         if (path == null) {
-            System.out.printf("Imagen %s no encontrado.", filePath);
+            log.error("Imagen " + filePath +" no encontrada");
             System.exit(1);
         }
         return path;

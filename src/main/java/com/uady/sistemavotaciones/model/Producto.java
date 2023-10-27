@@ -5,9 +5,21 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class Producto {
+public class Producto implements Dato {
 
     private String nombre;
-    private int cantidad;
+    private Integer cantidad;
+    private String archivoPath;
+    private String imagen;
+
+    @Override
+    public String getNombreDato() {
+        return nombre;
+    }
+
+    @Override
+    public Integer getCantidadDato() {
+        return cantidad;
+    }
 
 }

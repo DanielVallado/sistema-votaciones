@@ -1,15 +1,26 @@
 package com.uady.sistemavotaciones.dao;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j2
 public class VotacionDAO implements DAO<String> {
 
     private final String filePath;
 
     public VotacionDAO(String path) {
         this.filePath = path;
+        File file = new File(filePath);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                log.error("Error al crear el archivo.\n" + e.getMessage());
+            }
+        }
     }
 
     @Override
@@ -18,7 +29,7 @@ public class VotacionDAO implements DAO<String> {
             writer.write(message);
             writer.newLine();
         } catch (IOException e) {
-            System.err.println("Error al registrar.\n" + e.getMessage());
+            log.error("Error al registrar.\n" + e.getMessage());
         }
     }
 
@@ -32,8 +43,7 @@ public class VotacionDAO implements DAO<String> {
                 lineas.add(linea);
             }
         } catch (IOException e) {
-            System.err.println("Error al registrar.\n" + e.getMessage());
-
+            log.error("Error al registrar.\n" + e.getMessage());
         }
 
         return lineas;

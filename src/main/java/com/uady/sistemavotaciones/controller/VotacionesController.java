@@ -1,122 +1,144 @@
 package com.uady.sistemavotaciones.controller;
 
 import com.uady.sistemavotaciones.dao.VotacionDAO;
+import com.uady.sistemavotaciones.model.Producto;
+import com.uady.sistemavotaciones.util.MyFileReader;
 import com.uady.sistemavotaciones.util.Util;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
+@Log4j2
 public class VotacionesController implements Initializable {
 
     @FXML
-    public Label contOpcion1;
+    private GridPane contenedorProductos;
     @FXML
-    public Label contOpcion2;
+    private final Map<String, Label> productoContadorMap;
     @FXML
-    public Label contOpcion3;
-    @FXML
-    private Button botonVotar1;
-    @FXML
-    private Button botonVotar2;
-    @FXML
-    private Button botonVotar3;
-    @FXML
-    private ImageView imgProducto1;
-    @FXML
-    private ImageView imgProducto2;
-    @FXML
-    private ImageView imgProducto3;
+    private final Map<String, Stage> graficaStages;
 
-    private final Map<String, Integer> datos;
-    private final Map<String, String> productos;
-    private GraficaDeBarrasController graficaDeBarrasController;
-    private GraficaDePastelController graficaDePastelController;
-
+    private final List<Producto> productosList;
+    private final List<GraficaController> controladoresGraficas;
 
     public VotacionesController() {
-        this.datos = new HashMap<>();
-        this.productos = new HashMap<>();
-        productos.put("Corn Flakes", "C:\\Users\\danie\\OneDrive - Universidad Autonoma de Yucatan\\LIS\\LIS - Quinto Semestre\\Aquitectura de Software\\ADA 8 - MVC Votaciones\\sistema-votaciones\\src\\main\\resources\\com\\uady\\sistemavotaciones\\votaciones\\producto_1.txt");
-        productos.put("Oreo's", "C:\\Users\\danie\\OneDrive - Universidad Autonoma de Yucatan\\LIS\\LIS - Quinto Semestre\\Aquitectura de Software\\ADA 8 - MVC Votaciones\\sistema-votaciones\\src\\main\\resources\\com\\uady\\sistemavotaciones\\votaciones\\producto_2.txt");
-        productos.put("Nesquik", "C:\\Users\\danie\\OneDrive - Universidad Autonoma de Yucatan\\LIS\\LIS - Quinto Semestre\\Aquitectura de Software\\ADA 8 - MVC Votaciones\\sistema-votaciones\\src\\main\\resources\\com\\uady\\sistemavotaciones\\votaciones\\producto_3.txt");
+        this.graficaStages = new HashMap<>();
+        this.productoContadorMap = new HashMap<>();
+        this.controladoresGraficas = new ArrayList<>();
+        this.productosList = obtenerProductos();
+    }
+
+    private List<Producto> obtenerProductos() {
+        List<String> nombresProductos = MyFileReader.readFile("C:\\Users\\danie\\OneDrive - Universidad Autonoma de Yucatan\\LIS\\LIS - Quinto Semestre\\Aquitectura de Software\\ADA 8 - MVC Votaciones\\sistema-votaciones\\src\\main\\resources\\com\\uady\\sistemavotaciones\\productos.txt");
+        if (nombresProductos == null){
+            log.error("No hay productos");
+            System.exit(0);
+        }
+
+        List<Producto> productos = new ArrayList<>();
+        for (String nombre : nombresProductos) {
+            String archivoPath = "C:\\Users\\danie\\OneDrive - Universidad Autonoma de Yucatan\\LIS\\LIS - Quinto Semestre\\Aquitectura de Software\\ADA 8 - MVC Votaciones\\sistema-votaciones\\src\\main\\resources\\com\\uady\\sistemavotaciones\\votaciones\\%s.txt".formatted(nombre);
+            String imagenPath = "/com/uady/sistemavotaciones/images/%s.jpg".formatted(nombre);
+            productos.add(new Producto(nombre, 0, archivoPath, imagenPath));
+        }
+
+        return productos;
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        cargarImagenes();
+        log.info("Inicializar controlador de votaciones");
         colocarVotos();
-        asignarEventosToBotones();
+        int row = 0, col = 0;
+        for (Producto producto : productosList) {
+            VBox productBox = crearComponenteProducto(producto);
+            contenedorProductos.add(productBox, col, row);
+
+            col++;
+            if (col == 4) {
+                col = 0;
+                row++;
+            }
+        }
+    }
+
+    private VBox crearComponenteProducto(Producto producto) {
+        VBox productBox = new VBox();
+        productBox.setSpacing(10);
+        productBox.setAlignment(Pos.CENTER);
+        productBox.setPadding(new Insets(10, 5, 0, 5));
+
+        ImageView productImage = new ImageView(new Image(Objects.requireNonNull(Util.obtenerImg(producto.getImagen()))));
+        productImage.setFitWidth(170);
+        productImage.setPreserveRatio(true);
+
+        Button voteButton = new Button("Votar " + producto.getNombre());
+        voteButton.setOnAction(event -> votar(producto.getArchivoPath()));
+
+        Label contadorLabel = new Label(producto.getCantidad().toString());
+        contadorLabel.setStyle("-fx-font-size: 18px;");
+        productoContadorMap.put(producto.getNombre(), contadorLabel);
+
+        productBox.getChildren().addAll(productImage, voteButton, contadorLabel);
+        return productBox;
     }
 
     @FXML
     public void verEstadisticas() {
-        String GRAFICA_BARRAS_PATH = "/com/uady/sistemavotaciones/view/GraficaDeBarrasView.fxml";
-        mostrarGraficaBarras(Util.obtenerPath(GRAFICA_BARRAS_PATH));
+        log.info("Ver estadísticas");
+        String graficaBarrasPath = "/com/uady/sistemavotaciones/view/GraficaDeBarrasView.fxml";
+        String tituloGraficaBarras = "Sistema de Votaciones | Gráfica de Barras";
+        mostrarGrafica(Util.obtenerPath(graficaBarrasPath), tituloGraficaBarras);
 
-        String GRAFICA_PASTEL_PATH = "/com/uady/sistemavotaciones/view/GraficaDePastelView.fxml";
-        mostrarGraficaPasteles(Util.obtenerPath(GRAFICA_PASTEL_PATH));
+        String graficaPastelPath = "/com/uady/sistemavotaciones/view/GraficaDePastelView.fxml";
+        String tituloGraficaPastel = "Sistema de Votaciones | Gráfica de Pastel";
+        mostrarGrafica(Util.obtenerPath(graficaPastelPath), tituloGraficaPastel);
     }
 
-    private void mostrarGraficaBarras(URL filePath) {
-        FXMLLoader fxmlLoader = new FXMLLoader(filePath);
-        this.graficaDeBarrasController = new GraficaDeBarrasController(datos);
-        fxmlLoader.setController(graficaDeBarrasController);
-        Scene scene = getScene(fxmlLoader);
-        modificarScene("Sistema de Votaciones | Gráfica de Barras", scene);
+    private void mostrarGrafica(URL filePath, String titulo) {
+        log.info("Mostrar gráfica " + titulo);
+        if (!graficaStages.containsKey(titulo)) {
+            FXMLLoader fxmlLoader = new FXMLLoader(filePath);
+            crearScene(fxmlLoader, titulo);
+            this.controladoresGraficas.add(fxmlLoader.getController());
+            actualizarGraficas();
+        }
     }
 
-    private void mostrarGraficaPasteles(URL filePath) {
-        FXMLLoader fxmlLoader = new FXMLLoader(filePath);
-        this.graficaDePastelController = new GraficaDePastelController(datos);
-        fxmlLoader.setController(graficaDePastelController);
-        Scene scene = getScene(fxmlLoader);
-        modificarScene("Sistema de Votaciones | Gráfica de Pastel", scene);
-    }
-
-    private static void modificarScene(String titulo, Scene scene) {
-        Stage stage = new Stage();
-        stage.setTitle(titulo);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    private static Scene getScene(FXMLLoader fxmlLoader) {
+    private void crearScene(FXMLLoader fxmlLoader, String titulo) {
         try {
-            return new Scene(fxmlLoader.load());
+            Scene scene = new Scene(fxmlLoader.load());
+            Stage stage = new Stage();
+            stage.setTitle(titulo);
+            stage.setScene(scene);
+            stage.setOnCloseRequest(event -> graficaStages.remove(titulo));
+            graficaStages.put(titulo, stage);
+            stage.show();
         } catch (IOException e) {
+            log.error("Error al crear la escena");
             throw new RuntimeException(e);
         }
     }
 
-    private void asignarEventosToBotones() {
-        botonVotar1.setOnAction(event -> votar(productos.get("Corn Flakes")));
-        botonVotar2.setOnAction(event -> votar(productos.get("Oreo's")));
-        botonVotar3.setOnAction(event -> votar(productos.get("Nesquik")));
-    }
-
-    private void cargarImagenes() {
-        imgProducto1.setImage(new Image(Objects.requireNonNull(Util.obtenerImg("/com/uady/sistemavotaciones/images/imgProducto1.jpg"))));
-        imgProducto2.setImage(new Image(Objects.requireNonNull(Util.obtenerImg("/com/uady/sistemavotaciones/images/imgProducto2.jpg"))));
-        imgProducto3.setImage(new Image(Objects.requireNonNull(Util.obtenerImg("/com/uady/sistemavotaciones/images/imgProducto3.jpg"))));
-    }
-
     private void votar(String filePath) {
-        System.out.println("Voto registrado");
+        log.info("Voto registrado");
         String fechaHoraActual = obtenerHora();
         VotacionDAO votacionDAO = new VotacionDAO(filePath);
         votacionDAO.registrar(fechaHoraActual);
@@ -130,37 +152,41 @@ public class VotacionesController implements Initializable {
     }
 
     private void colocarVotos() {
-        for (Map.Entry<String, String> entry : productos.entrySet()) {
-            String producto = entry.getKey();
-            int cantVotos =  contarVotos(entry.getValue());
-            datos.put(producto, cantVotos);
-            actualizarEtiqueta(producto, cantVotos);
-            actualizarGraficas();
+        log.info("Colocar voto");
+        for (Producto producto : productosList) {
+            producto.setCantidad(contarVotos(producto.getArchivoPath()));
         }
+
+        actualizarEtiquetas();
+        actualizarGraficas();
     }
-
-    private void actualizarEtiqueta(String producto, int cantidadVotos) {
-        switch (producto) {
-            case "Corn Flakes" -> contOpcion1.setText(String.valueOf(cantidadVotos));
-            case "Oreo's" -> contOpcion2.setText(String.valueOf(cantidadVotos));
-            case "Nesquik" -> contOpcion3.setText(String.valueOf(cantidadVotos));
-        }
-    }
-
-    private void actualizarGraficas() {
-        if (graficaDeBarrasController != null) {
-            graficaDeBarrasController.actualizarDatos(datos);
-        }
-        if (graficaDePastelController != null) {
-            graficaDePastelController.actualizarDatos(datos);
-        }
-
-    }
-
 
     private int contarVotos(String filePath) {
         VotacionDAO votacionDAO = new VotacionDAO(filePath);
         return votacionDAO.obtenerTodos().size();
+    }
+
+    private void actualizarEtiquetas() {
+        for (Producto producto : productosList) {
+            Label contadorLabel = productoContadorMap.get(producto.getNombre());
+
+            if (contadorLabel != null) {
+                contadorLabel.setText(producto.getCantidad().toString());
+            }
+        }
+    }
+
+    private void actualizarGraficas() {
+        log.info("Actualizar gráficas");
+        controladoresGraficas.stream()
+                .filter(Objects::nonNull)
+                .forEach(controller -> controller.actualizarDatos(productosList));
+    }
+
+    public void cerrarVentanasGraficas() {
+        for (Stage stage : graficaStages.values()) {
+            stage.close();
+        }
     }
 
 }
