@@ -20,8 +20,8 @@ public class Util {
     public static InputStream obtenerImg(String filePath) {
         InputStream path = Util.class.getResourceAsStream(filePath);
         if (path == null) {
-            log.error("Imagen " + filePath +" no encontrada");
-            System.exit(1);
+            log.warn("Imagen " + filePath +" no encontrada");
+            path = Util.class.getResourceAsStream("/com/uady/sistemavotaciones/images/Default.jpg");
         }
         return path;
     }
