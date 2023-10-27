@@ -996,3 +996,27 @@
 13:07:26.876 [JavaFX Application Thread] Util.obtenerImg:23 WARN  - Imagen /com/uady/sistemavotaciones/images/nuevo.jpg no encontrada
 13:07:26.902 [JavaFX Application Thread] Util.obtenerImg:23 WARN  - Imagen /com/uady/sistemavotaciones/images/nuevo.jpg no encontrada
 13:07:26.923 [JavaFX Application Thread] Util.obtenerImg:23 WARN  - Imagen /com/uady/sistemavotaciones/images/nuevo.jpg no encontrada
+13:23:06.362 [main] SistemaVotaciones.main:29 INFO  - Inicio de programa
+13:23:06.922 [JavaFX Application Thread] VotacionesController.initialize:54 INFO  - Inicializar controlador de votaciones
+13:23:06.922 [JavaFX Application Thread] VotacionesController.colocarVotos:142 INFO  - Colocar voto
+13:23:06.926 [JavaFX Application Thread] VotacionesController.actualizarGraficas:167 INFO  - Actualizar gráficas
+13:23:09.441 [JavaFX Application Thread] VotacionesController.votar:128 INFO  - Voto registrado
+13:23:09.456 [JavaFX Application Thread] VotacionesController.colocarVotos:142 INFO  - Colocar voto
+13:23:09.459 [JavaFX Application Thread] VotacionesController.actualizarGraficas:167 INFO  - Actualizar gráficas
+13:25:11.683 [main] SistemaVotaciones.main:29 INFO  - Inicio de programa
+13:25:12.085 [JavaFX Application Thread] VotacionesController.initialize:50 INFO  - Inicializar controlador de votaciones
+13:25:12.086 [JavaFX Application Thread] VotacionesController.colocarVotos:129 INFO  - Colocar voto
+13:25:12.089 [JavaFX Application Thread] VotacionesController.actualizarGraficas:149 INFO  - Actualizar gráficas
+13:25:13.593 [JavaFX Application Thread] ProductoService.votar:34 INFO  - Voto registrado
+13:25:13.603 [JavaFX Application Thread] VotacionesController.colocarVotos:129 INFO  - Colocar voto
+13:25:13.606 [JavaFX Application Thread] VotacionesController.actualizarGraficas:149 INFO  - Actualizar gráficas
+13:25:14.577 [JavaFX Application Thread] VotacionesController.verEstadisticas:88 INFO  - Ver estadísticas
+13:25:14.578 [JavaFX Application Thread] VotacionesController.mostrarGrafica:99 INFO  - Mostrar gráfica Sistema de Votaciones | Gráfica de Barras
+13:25:14.674 [JavaFX Application Thread] GraficaDeBarrasController.initialize:28 INFO  - Creación gráfica de barras
+13:25:14.742 [JavaFX Application Thread] VotacionesController.actualizarGraficas:149 INFO  - Actualizar gráficas
+13:25:14.762 [JavaFX Application Thread] GraficaDeBarrasController.actualizarDatos:54 INFO  - Actualización de datos realizada
+13:25:14.762 [JavaFX Application Thread] VotacionesController.mostrarGrafica:99 INFO  - Mostrar gráfica Sistema de Votaciones | Gráfica de Pastel
+13:25:14.778 [JavaFX Application Thread] GraficaDePastelController.initialize:26 INFO  - Creación gráfica de pastel
+13:25:14.800 [JavaFX Application Thread] VotacionesController.actualizarGraficas:149 INFO  - Actualizar gráficas
+13:25:14.815 [JavaFX Application Thread] GraficaDeBarrasController.actualizarDatos:54 INFO  - Actualización de datos realizada
+13:25:14.824 [JavaFX Application Thread] GraficaDePastelController.actualizarDatos:41 INFO  - Actualización de datos realizada

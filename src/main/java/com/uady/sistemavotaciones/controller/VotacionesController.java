@@ -1,8 +1,7 @@
 package com.uady.sistemavotaciones.controller;
 
-import com.uady.sistemavotaciones.dao.VotacionDAO;
 import com.uady.sistemavotaciones.model.Producto;
-import com.uady.sistemavotaciones.util.MyFileReader;
+import com.uady.sistemavotaciones.service.ProductoService;
 import com.uady.sistemavotaciones.util.Util;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,8 +20,6 @@ import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Log4j2
@@ -38,28 +35,14 @@ public class VotacionesController implements Initializable {
     private final List<Producto> productosList;
     private final List<GraficaController> controladoresGraficas;
 
+    private final ProductoService service;
+
     public VotacionesController() {
         this.graficaStages = new HashMap<>();
         this.productoContadorMap = new HashMap<>();
         this.controladoresGraficas = new ArrayList<>();
-        this.productosList = obtenerProductos();
-    }
-
-    private List<Producto> obtenerProductos() {
-        List<String> nombresProductos = MyFileReader.readFile("C:\\Users\\danie\\OneDrive - Universidad Autonoma de Yucatan\\LIS\\LIS - Quinto Semestre\\Aquitectura de Software\\ADA 8 - MVC Votaciones\\sistema-votaciones\\src\\main\\resources\\com\\uady\\sistemavotaciones\\productos.txt");
-        if (nombresProductos == null){
-            log.error("No hay productos");
-            System.exit(0);
-        }
-
-        List<Producto> productos = new ArrayList<>();
-        for (String nombre : nombresProductos) {
-            String archivoPath = "C:\\Users\\danie\\OneDrive - Universidad Autonoma de Yucatan\\LIS\\LIS - Quinto Semestre\\Aquitectura de Software\\ADA 8 - MVC Votaciones\\sistema-votaciones\\src\\main\\resources\\com\\uady\\sistemavotaciones\\votaciones\\%s.txt".formatted(nombre);
-            String imagenPath = "/com/uady/sistemavotaciones/images/%s.jpg".formatted(nombre);
-            productos.add(new Producto(nombre, 0, archivoPath, imagenPath));
-        }
-
-        return productos;
+        this.service = new ProductoService();
+        this.productosList = service.obtenerProductos();
     }
 
     @Override
@@ -138,32 +121,18 @@ public class VotacionesController implements Initializable {
     }
 
     private void votar(String filePath) {
-        log.info("Voto registrado");
-        String fechaHoraActual = obtenerHora();
-        VotacionDAO votacionDAO = new VotacionDAO(filePath);
-        votacionDAO.registrar(fechaHoraActual);
+        service.votar(filePath);
         colocarVotos();
-    }
-
-    private String obtenerHora() {
-        LocalDateTime fechaHoraActual = LocalDateTime.now();
-        DateTimeFormatter formatoFechaHora = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return fechaHoraActual.format(formatoFechaHora);
     }
 
     private void colocarVotos() {
         log.info("Colocar voto");
         for (Producto producto : productosList) {
-            producto.setCantidad(contarVotos(producto.getArchivoPath()));
+            producto.setCantidad(service.contarVotos(producto.getArchivoPath()));
         }
 
         actualizarEtiquetas();
         actualizarGraficas();
-    }
-
-    private int contarVotos(String filePath) {
-        VotacionDAO votacionDAO = new VotacionDAO(filePath);
-        return votacionDAO.obtenerTodos().size();
     }
 
     private void actualizarEtiquetas() {
